@@ -1,5 +1,6 @@
 from flask import Flask, request, render_template
 import requests
+import json
 
 app = Flask("covid-data-service")
 
@@ -19,15 +20,22 @@ def getCountryStats():
     headers = {
         'x-rapidapi-host': "covid-19-coronavirus-statistics.p.rapidapi.com",
         'x-rapidapi-key': "759ce667bamsh2973be0263e0a10p132f63jsn35e77aafb8c7"
-    }
+        }
 
-    json = requests.get(url, headers=headers, params=parameters).json()
+    response = requests.get(url, headers=headers, params=parameters).json()
 
-    updated = json['data']['covid19Stats'][0]['lastUpdate']
-    infected = json['data']['covid19Stats'][0]['confirmed']
-    deaths = json['data']['covid19Stats'][0]['deaths']
-    recovered = json['data']['covid19Stats'][0]['recovered']
+    updated = response['data']['covid19Stats'][0]['lastUpdate']
+    infected = response['data']['covid19Stats'][0]['confirmed']
+    deaths = response['data']['covid19Stats'][0]['deaths']
+    recovered = response['data']['covid19Stats'][0]['recovered']
 
-    result_string = "{}\n{}\n{}\n{}".format(updated, infected, deaths, recovered)
+    data_dict = {
+        'updated' : updated,
+        'infected' : infected,
+        'deaths' : deaths,
+        'recovered' : recovered
+        }
+        
+    json_data = json.dumps(data_dict)
 
-    return result_string
+    return json_data
