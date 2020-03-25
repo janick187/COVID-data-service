@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, Response, render_template
 from flask_cors import CORS
 import requests
 import json
@@ -39,4 +39,8 @@ def getCountryStats():
         
     json_data = json.dumps(data_dict)
 
-    return json_data
+    resp = Response(json_data)
+    resp.headers['Access-Control-Allow-Origin'] = '*'
+    resp.headers['content-type'] = 'application/json'
+    
+    return resp
