@@ -1,7 +1,7 @@
 from flask import Flask, request, render_template
 import requests
 
-app = Flask("Corona Data Chief")
+app = Flask("covid-data-service")
 
 
 @app.route('/getCountryStats', methods = ["GET"])
