@@ -1,9 +1,10 @@
 from flask import Flask, request, render_template
+from flask_cors import CORS
 import requests
 import json
 
-app = Flask("covid-data-service")
-
+app = Flask(__name__)
+CORS(app)
 
 @app.route('/getCountryStats', methods = ["GET"])
 def getCountryStats():
