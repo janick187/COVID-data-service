@@ -1,46 +1,35 @@
 from flask import Flask, request, Response, render_template
-from flask_cors import CORS
 import requests
 import json
 
 app = Flask(__name__)
-CORS(app)
 
 @app.route('/getCountryStats', methods = ["GET"])
 def getCountryStats():
     # your code
 
-    url = "https://covid-19-coronavirus-statistics.p.rapidapi.com/v1/stats"
+    url = "https://covidapi.info/api/v1/country/{}/latest".format(request.args.get('country'))
 
-    # country = input("Type in the country you are interested in: ")
+    response = requests.get(url).json()
 
-    parameters = {
-        "country": request.args.get('country')
-        }
+    date = list(response['result'].items())[0][0]
 
-    headers = {
-        'x-rapidapi-host': "covid-19-coronavirus-statistics.p.rapidapi.com",
-        'x-rapidapi-key': "759ce667bamsh2973be0263e0a10p132f63jsn35e77aafb8c7"
-        }
-
-    response = requests.get(url, headers=headers, params=parameters).json()
-
-    updated = response['data']['covid19Stats'][0]['lastUpdate']
-    infected = response['data']['covid19Stats'][0]['confirmed']
-    deaths = response['data']['covid19Stats'][0]['deaths']
-    recovered = response['data']['covid19Stats'][0]['recovered']
+    infected = response['result'][date]['confirmed']
+    deaths = response['result'][date]['deaths']
+    recovered = response['result'][date]['recovered']
+    mortality = round((deaths * 100) / infected, 2)
 
     data_dict = {
-        'updated' : updated,
+        'updated' : date,
         'infected' : infected,
         'deaths' : deaths,
-        'recovered' : recovered
+        'recovered' : recovered,
+        'mortality' : mortality
         }
         
     json_data = json.dumps(data_dict)
 
     resp = Response(json_data)
     resp.headers['Access-Control-Allow-Origin'] = '*'
-    resp.headers['content-type'] = 'application/json'
     
     return resp
