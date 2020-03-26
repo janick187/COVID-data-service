@@ -10,26 +10,35 @@ def getCountryStats():
 
     url = "https://covidapi.info/api/v1/country/{}/latest".format(request.args.get('country'))
 
-    response = requests.get(url).json()
-
-    date = list(response['result'].items())[0][0]
-
-    infected = response['result'][date]['confirmed']
-    deaths = response['result'][date]['deaths']
-    recovered = response['result'][date]['recovered']
-    mortality = round((deaths * 100) / infected, 2)
-
-    data_dict = {
-        'updated' : date,
-        'infected' : infected,
-        'deaths' : deaths,
-        'recovered' : recovered,
-        'mortality' : mortality
-        }
+    response = requests.get(url)
+    
+    if response.status_code == 200:
         
-    json_data = json.dumps(data_dict)
+        data =response.json()
+        
+        date = list(data['result'].items())[0][0]
 
-    resp = Response(json_data)
+        infected = data['result'][date]['confirmed']
+        deaths = data['result'][date]['deaths']
+        recovered = data['result'][date]['recovered']
+        mortality = round((deaths * 100) / infected, 2)
+
+        data_dict = {
+            'updated' : date,
+            'infected' : infected,
+            'deaths' : deaths,
+            'recovered' : recovered,
+            'mortality' : mortality
+            }
+        
+        json_data = json.dumps(data_dict)
+
+        resp = Response(json_data)
+
+    else:
+       
+       resp = Response(status=404)
+    
     resp.headers['Access-Control-Allow-Origin'] = '*'
     
     return resp
